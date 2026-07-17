@@ -30,6 +30,7 @@ open -R "$(readlink -f $(which claude))"
 ```sh
 # Ctrl+C, then:
 claude --resume   # pick your session — nothing is lost
+claude -c         # or: continue the most recent session directly
 ```
 
 5. Have Claude call `request_access` again → the one-time per-app approval dialog appears → approve → computer use is live.
