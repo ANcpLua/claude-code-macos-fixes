@@ -2,7 +2,7 @@
 
 Solutions for two problems Claude Code currently has on macOS, debugged live on a real machine (MacBook Air M4, macOS Tahoe 26.5.2, Ghostty 1.3.1, Homebrew install of `@anthropic-ai/claude-code`).
 
-📄 **Full guide:** [`computer-use-tcc-fix.html`](computer-use-tcc-fix.html) · [web edition on claude.ai](https://claude.ai/code/artifact/54ce0279-69e9-4d72-9870-4efa7410de9e)
+📄 **Full guide:** [ancplua.github.io/claude-code-macos-fixes](https://ancplua.github.io/claude-code-macos-fixes/) · source: [`computer-use-tcc-fix.html`](computer-use-tcc-fix.html)
 
 ## The two problems
 
