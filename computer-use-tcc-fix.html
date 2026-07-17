@@ -6,15 +6,17 @@
 <title>Why Computer Use says "not yet granted" — and the fix</title>
 <style>
   :root {
-    --ivory:   #FAF9F5;
-    --slate:   #141413;
-    --clay:    #D97757;
-    --oat:     #E3DACC;
-    --olive:   #788C5D;
-    --gray-150:#F0EEE6;
-    --gray-300:#D1CFC5;
-    --gray-500:#87867F;
-    --gray-700:#3D3D3A;
+    color-scheme: dark;
+    --ivory:   #1F1E1B;
+    --slate:   #F0EEE6;
+    --clay:    #E08862;
+    --oat:     #3D3A33;
+    --olive:   #94A878;
+    --gray-150:#2A2925;
+    --gray-300:#3D3D3A;
+    --gray-500:#9B9A93;
+    --gray-700:#C9C7BE;
+    --card:    #262624;
     --serif: ui-serif, Georgia, "Times New Roman", serif;
     --sans:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono:  ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -96,7 +98,7 @@
     border: 1.5px solid var(--gray-300);
     border-left: 3px solid var(--clay);
     border-radius: 10px;
-    background: #fff;
+    background: var(--card);
     padding: 16px 18px;
     margin-bottom: 8px;
   }
@@ -116,7 +118,7 @@
   details {
     border: 1.5px solid var(--gray-300);
     border-radius: 10px;
-    background: #fff;
+    background: var(--card);
     margin: 14px 0;
     overflow: hidden;
   }
@@ -163,7 +165,7 @@
   .tabs {
     border: 1.5px solid var(--gray-300);
     border-radius: 10px;
-    background: #fff;
+    background: var(--card);
     margin: 16px 0 8px;
     overflow: hidden;
   }
@@ -185,7 +187,7 @@
     border-right: 1px solid var(--gray-300);
   }
   .tabbar button.on {
-    background: #fff;
+    background: var(--card);
     color: var(--slate);
     border-bottom: 2px solid var(--clay);
     margin-bottom: -1px;
@@ -208,7 +210,7 @@
     display: flex;
     gap: 12px;
     border: 1.5px solid var(--oat);
-    background: rgba(227,218,204,0.35);
+    background: rgba(61,58,51,0.45);
     border-radius: 10px;
     padding: 14px 16px;
     margin: 18px 0;
