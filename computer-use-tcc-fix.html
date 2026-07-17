@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why Computer Use says "not yet granted" — and the fix</title>
+<style>
+  :root {
+    --ivory:   #FAF9F5;
+    --slate:   #141413;
+    --clay:    #D97757;
+    --oat:     #E3DACC;
+    --olive:   #788C5D;
+    --gray-150:#F0EEE6;
+    --gray-300:#D1CFC5;
+    --gray-500:#87867F;
+    --gray-700:#3D3D3A;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ivory);
+    color: var(--gray-700);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 24px 120px;
+  }
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 48px;
+  }
+  @media (max-width: 920px) { .page { grid-template-columns: 1fr; } nav { display: none; } }
+
+  nav {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+    font-size: 13px;
+  }
+  nav .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+  }
+  nav a {
+    display: block;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid var(--gray-300);
+    color: var(--gray-700);
+    text-decoration: none;
+  }
+  nav a:hover { color: var(--slate); border-color: var(--slate); }
+  nav a.l2 { padding-left: 24px; font-size: 12.5px; color: var(--gray-500); }
+  nav .files {
+    margin-top: 28px;
+    border-top: 1px solid var(--gray-300);
+    padding-top: 16px;
+  }
+  nav .files code {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-500);
+    padding: 3px 0;
+  }
+
+  header { margin-bottom: 12px; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 32px;
+    color: var(--slate);
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+    text-wrap: balance;
+  }
+  .tldr {
+    border: 1.5px solid var(--gray-300);
+    border-left: 3px solid var(--clay);
+    border-radius: 10px;
+    background: #fff;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+  }
+  .tldr b { color: var(--slate); }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--slate);
+    margin: 40px 0 14px;
+    scroll-margin-top: 24px;
+  }
+  p { margin-bottom: 12px; max-width: 680px; }
+  code { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+
+  details {
+    border: 1.5px solid var(--gray-300);
+    border-radius: 10px;
+    background: #fff;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--slate);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "▸";
+    color: var(--clay);
+    font-family: var(--sans);
+    font-size: 12px;
+    transition: transform 120ms;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary .where {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-left: auto;
+    text-align: right;
+  }
+  details .body { padding: 0 16px 16px; }
+  details .body p { font-size: 14px; }
+  details .body pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    background: var(--gray-150);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 8px 0 4px;
+    overflow-x: auto;
+  }
+
+  .tabs {
+    border: 1.5px solid var(--gray-300);
+    border-radius: 10px;
+    background: #fff;
+    margin: 16px 0 8px;
+    overflow: hidden;
+  }
+  .tabbar {
+    display: flex;
+    border-bottom: 1px solid var(--gray-300);
+    background: var(--gray-150);
+    flex-wrap: wrap;
+  }
+  .tabbar button {
+    appearance: none;
+    border: none;
+    background: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-500);
+    padding: 10px 16px;
+    cursor: pointer;
+    border-right: 1px solid var(--gray-300);
+  }
+  .tabbar button.on {
+    background: #fff;
+    color: var(--slate);
+    border-bottom: 2px solid var(--clay);
+    margin-bottom: -1px;
+  }
+  .tabs pre {
+    display: none;
+    margin: 0;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--slate);
+    overflow-x: auto;
+  }
+  .tabs pre.on { display: block; }
+  .hl { color: var(--clay); }
+  .cm { color: var(--gray-500); }
+
+  .callout {
+    display: flex;
+    gap: 12px;
+    border: 1.5px solid var(--oat);
+    background: rgba(227,218,204,0.35);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 18px 0;
+    font-size: 14px;
+  }
+  .callout .ico { color: var(--clay); font-weight: 600; }
+
+  dl.faq { margin-top: 8px; }
+  dl.faq dt {
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--slate);
+    margin-top: 18px;
+  }
+  dl.faq dd { font-size: 14px; margin: 4px 0 0; max-width: 640px; }
+
+  .copybar { margin-top: 32px; }
+  .copybar button {
+    appearance: none;
+    border: 1.5px solid var(--slate);
+    background: var(--slate);
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  .copybar button:hover { background: var(--gray-700); }
+  .copybar .done { color: var(--olive); font-family: var(--mono); font-size: 12px; margin-left: 10px; }
+
+  footer.links {
+    margin-top: 40px;
+    border-top: 1px solid var(--gray-300);
+    padding-top: 16px;
+    font-size: 13px;
+    color: var(--gray-500);
+  }
+  footer.links a { color: var(--clay); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav>
+    <div class="label">On this page</div>
+    <a href="#tldr">TL;DR</a>
+    <a href="#why">Why it fails</a>
+    <a href="#fix">The fix, step by step</a>
+    <a href="#fix" class="l2">1. Locate binary</a>
+    <a href="#fix" class="l2">2. Reveal in Finder</a>
+    <a href="#fix" class="l2">3. Drag into both lists</a>
+    <a href="#fix" class="l2">4. Restart the CLI</a>
+    <a href="#fix" class="l2">5. Request again</a>
+    <a href="#commands">Commands &amp; dialogs</a>
+    <a href="#traps">The five traps</a>
+    <a href="#faq">FAQ</a>
+    <div class="files">
+      <div class="label">Reference setup</div>
+      <code>MacBook Air M4 (2025)</code>
+      <code>macOS Tahoe 26.5.2</code>
+      <code>Ghostty 1.3.1 (15212)</code>
+      <code>brew claude-code</code>
+      <code>works inside tmux</code>
+    </div>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">Claude Code · Computer Use · macOS TCC</div>
+      <h1>Why Computer Use says <code>not yet granted</code> — and the fix</h1>
+      <div class="tldr" id="tldr">
+        <b>TL;DR</b> — The built-in <code>computer-use</code> MCP server lives <em>inside the
+        <code>claude</code> CLI process</em>. macOS TCC attributes Accessibility and Screen Recording to the
+        binary that asks — <code>claude.exe</code> (yes, really) — not to your terminal and not to Claude.app.
+        Drag that binary into <b>both</b> permission lists, then restart the CLI
+        (<code>claude --resume</code> keeps your session): grants are only read at process start.
+      </div>
+    </header>
+
+    <h2 id="why">Why every toggle you flipped changed nothing</h2>
+    <p>You enabled Ghostty, iTerm, Terminal, even Claude.app — all blue toggles — and
+      <code>request_access</code> still loops with <em>“Accessibility and Screen Recording permission(s) not
+      yet granted.”</em> Two macOS facts explain it:</p>
+    <details open>
+      <summary>Fact 1 · TCC binds to the requesting binary <span class="where">not the host app</span></summary>
+      <div class="body">
+        <p>The computer-use server is not a separate helper app. It runs inside the CLI process, so the TCC
+          identity macOS checks is the CLI binary itself:</p>
+        <pre>/opt/homebrew/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe</pre>
+        <p>Terminal-app grants cover <em>other</em> things — your shell’s <code>screencapture</code> may even
+          work while the MCP server stays blocked, which makes the failure genuinely confusing.</p>
+      </div>
+    </details>
+    <details open>
+      <summary>Fact 2 · Grants are read once, at launch <span class="where">stale-process trap</span></summary>
+      <div class="body">
+        <p>A running process caches its TCC state. Fixing the lists mid-session changes nothing until the
+          <code>claude</code> process restarts. This is why “I granted it and it still fails” is the default
+          experience.</p>
+      </div>
+    </details>
+
+    <h2 id="fix">The fix, step by step</h2>
+    <details open>
+      <summary>1 · Locate your real binary <span class="where">Terminal</span></summary>
+      <div class="body">
+        <pre>readlink -f $(which claude)
+<span class="cm"># → …/@anthropic-ai/claude-code/bin/claude.exe</span></pre>
+        <p>Homebrew shown; npm/bun installs land elsewhere — this command always tells the truth.</p>
+      </div>
+    </details>
+    <details open>
+      <summary>2 · Reveal it in Finder <span class="where">open -R</span></summary>
+      <div class="body">
+        <pre>open -R "$(readlink -f $(which claude))"</pre>
+        <p>Spotlight does not index <code>/opt/homebrew</code>, so the search field in the permission dialog
+          will never find it. Finder is the reliable route.</p>
+      </div>
+    </details>
+    <details open>
+      <summary>3 · Drag it into BOTH permission lists <span class="where">System Settings</span></summary>
+      <div class="body">
+        <p>System Settings → Privacy &amp; Security → <b>Accessibility</b>: drag <code>claude.exe</code> from
+          Finder straight onto the app list. Repeat for <b>Screen &amp; System Audio Recording</b>. Enable
+          both toggles. Drag &amp; drop skips the broken “+” dialog entirely.</p>
+      </div>
+    </details>
+    <details open>
+      <summary>4 · Restart the CLI — context survives <span class="where">claude --resume</span></summary>
+      <div class="body">
+        <pre>Ctrl+C
+claude --resume   <span class="cm"># pick your session — nothing is lost</span></pre>
+      </div>
+    </details>
+    <details open>
+      <summary>5 · Request access again <span class="where">in the session</span></summary>
+      <div class="body">
+        <p>Have Claude call <code>request_access</code> once more. Instead of the loop message you get the
+          one-time per-app approval dialog. Approve it — computer use is live.</p>
+      </div>
+    </details>
+
+    <h2 id="commands">Commands &amp; what you should see</h2>
+    <div class="tabs" data-tabs>
+      <div class="tabbar">
+        <button class="on" data-t="0">terminal</button>
+        <button data-t="1">before (the loop)</button>
+        <button data-t="2">after (success)</button>
+      </div>
+<pre class="on"><span class="cm"># 1 — where is the binary really?</span>
+readlink -f $(which claude)
+
+<span class="cm"># 2 — reveal it for drag &amp; drop</span>
+open -R "$(readlink -f $(which claude))"
+
+<span class="cm"># 3 — after fixing both lists</span>
+<span class="hl">claude --resume</span></pre>
+<pre>› request_access(apps: ["Infinity Kingdom"])
+
+<span class="hl">macOS Accessibility and Screen Recording
+permission(s) not yet granted. The permission
+panel has been shown. Once the user grants the
+missing permission(s), call request_access again.</span>
+
+<span class="cm"># …forever, no matter which app toggles you flip</span></pre>
+<pre>› request_access(apps: ["Infinity Kingdom"])
+
+<span class="cm"># macOS approval dialog appears, listing the
+# requested apps — user clicks Allow</span>
+
+granted: ["Infinity Kingdom"]   <span class="hl">✓ live</span></pre>
+    </div>
+
+    <div class="callout">
+      <span class="ico">★</span>
+      <div>The fix also holds <b>inside tmux</b>: because it targets the <code>claude</code> binary itself, it
+        works even though tmux runs as its own daemon and terminal-app grants would not carry over there.</div>
+    </div>
+
+    <h2 id="traps">The five traps (we hit the first four ourselves)</h2>
+    <details>
+      <summary>Trap 1 · The Spotlight search field <span class="where">“+” file dialog</span></summary>
+      <div class="body">
+        <p>In the “+” dialog, <code>Cmd+Shift+G</code> only opens Go-to-Folder after you click into the file
+          list; otherwise your pasted path lands in the search box — and Spotlight doesn’t index
+          <code>/opt/homebrew</code>, so it finds nothing. Drag &amp; drop from Finder avoids the dialog
+          completely.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Trap 2 · The Unarchiver eats your CLI <span class="where">double-click</span></summary>
+      <div class="body">
+        <p>Don’t double-click <code>claude.exe</code>. macOS treats <code>.exe</code> as a Windows archive and
+          hands it to The Unarchiver, which offers to “extract” your CLI. Cancel — the file is dragged, never
+          opened. (The binary is named <code>.exe</code> on macOS too; build-system artifact.)</p>
+      </div>
+    </details>
+    <details>
+      <summary>Trap 3 · Granting the wrong app <span class="where">Ghostty / iTerm / Claude.app</span></summary>
+      <div class="body">
+        <p>Terminal and Claude.app entries cover other features. The cruellest variant: shell
+          <code>screencapture</code> works through the terminal’s grant while the MCP server stays blocked —
+          so quick sanity checks “prove” permissions are fine when they aren’t.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Trap 4 · The stale process <span class="where">grants read at launch</span></summary>
+      <div class="body">
+        <p>Everything correct, still failing? The session predates the grant. <code>Ctrl+C</code> then
+          <code>claude --resume</code> — TCC state is only read at process start, and resume keeps your full
+          context.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Trap 5 · The orphaned per-version helper <span class="where">community-reported · unverified by us</span></summary>
+      <div class="body">
+        <p>All TCC grants correct, restart done, <em>still</em> looping? Several reports
+          (<a href="https://github.com/anthropics/claude-code/issues/50735">anthropics/claude-code#50735</a>
+          plus duplicates #48311, #49282, #41606) point at Claude Code’s per-version helper bundle with a
+          <code>.verified</code> sentinel under
+          <code>~/Library/Application Support/Claude/claude-code/&lt;VERSION&gt;/</code> not being
+          re-provisioned by auto-updates. Their reliable fix:</p>
+        <pre>ls ~/Library/Application\ Support/Claude/claude-code/
+<span class="cm"># last resort: quit CLI, delete the claude-code/
+# dir, relaunch — it re-extracts</span></pre>
+        <p><b>Caveat from our own machine:</b> a helper dir three versions behind the CLI (2.1.209 vs
+          2.1.212) worked fine here once Traps 1–4 were fixed — a version mismatch alone proves nothing.
+          Rule out Traps 1–4 first; deletion is a last resort, not a diagnostic.</p>
+      </div>
+    </details>
+
+    <h2 id="faq">FAQ</h2>
+    <dl class="faq">
+      <dt>Why is it called <code>claude.exe</code> on a Mac?</dt>
+      <dd>Build-system artifact — it’s the genuine native macOS binary, the name just kept the
+        <code>.exe</code> suffix. Ignore it (and don’t let The Unarchiver near it).</dd>
+
+      <dt>Do I lose my session when I restart?</dt>
+      <dd>No. <code>claude --resume</code> restores the full conversation context; you continue exactly where
+        you stopped.</dd>
+
+      <dt>Does this apply to the Claude desktop app?</dt>
+      <dd>No — Claude.app manages its own TCC entries. This guide is for the CLI (<code>claude</code> in a
+        terminal), where the built-in computer-use MCP inherits the CLI binary’s identity.</dd>
+
+      <dt>I use npm/bun, not Homebrew — same fix?</dt>
+      <dd>Yes, only the path differs. <code>readlink -f $(which claude)</code> in step 1 resolves your actual
+        install location; drag whatever it prints.</dd>
+
+      <dt>Claude Code updated — do I need to redo this?</dt>
+      <dd>If the update replaces the binary at the same path, existing grants usually survive. If computer use
+        starts looping again after an update, repeat steps 1–4 — two minutes.</dd>
+    </dl>
+
+    <div class="copybar">
+      <button id="copymd">Copy as markdown</button>
+      <span class="done" id="copydone"></span>
+    </div>
+
+    <footer class="links">
+      Shareable web edition of this guide:
+      <a href="https://claude.ai/code/artifact/54ce0279-69e9-4d72-9870-4efa7410de9e">claude.ai artifact</a>
+      · debugged live on 2026-07-17
+    </footer>
+  </main>
+
+</div>
+
+<script>
+document.querySelectorAll("[data-tabs]").forEach(box => {
+  const btns = box.querySelectorAll("button");
+  const panes = box.querySelectorAll("pre");
+  btns.forEach(b => b.addEventListener("click", () => {
+    btns.forEach(x => x.classList.remove("on"));
+    panes.forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    panes[+b.dataset.t].classList.add("on");
+  }));
+});
+
+document.getElementById("copymd").addEventListener("click", async () => {
+  const md = `# Claude Code Computer Use on macOS: fixing the "not yet granted" loop
+
+**TL;DR** — The built-in computer-use MCP server runs inside the \`claude\` CLI process. macOS TCC binds Accessibility + Screen Recording to the requesting binary (\`claude.exe\`), not your terminal or Claude.app — and grants are only read at process start.
+
+## Fix
+1. \`readlink -f $(which claude)\`  → e.g. /opt/homebrew/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe
+2. \`open -R "$(readlink -f $(which claude))"\`  (Spotlight doesn't index /opt/homebrew)
+3. System Settings → Privacy & Security → drag claude.exe into **Accessibility** AND **Screen & System Audio Recording**, enable both
+4. \`Ctrl+C\` → \`claude --resume\`  (grants are read at launch; resume keeps context)
+5. Call request_access again → per-app approval dialog appears → done
+
+## Traps
+- "+"-dialog search field is Spotlight — it will never find /opt/homebrew. Drag & drop instead.
+- Don't double-click claude.exe: macOS hands .exe to The Unarchiver ("extract"? → Cancel).
+- Granting Ghostty/iTerm/Claude.app is NOT enough; shell \`screencapture\` can work while the MCP stays blocked.
+- Fixed lists but still looping = stale process. Restart the CLI.
+
+Also holds inside tmux (fix targets the binary itself).
+Reference: MacBook Air M4, macOS Tahoe 26.5.2, Ghostty 1.3.1, brew install of @anthropic-ai/claude-code.
+Web edition: https://claude.ai/code/artifact/54ce0279-69e9-4d72-9870-4efa7410de9e`;
+  await navigator.clipboard.writeText(md);
+  const done = document.getElementById("copydone");
+  done.textContent = "copied ✓";
+  setTimeout(() => done.textContent = "", 2000);
+});
+</script>
+</body>
+</html>
