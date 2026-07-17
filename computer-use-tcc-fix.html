@@ -464,8 +464,17 @@ granted: ["Infinity Kingdom"]   <span class="hl">✓ live</span></pre>
         install location; drag whatever it prints.</dd>
 
       <dt>Claude Code updated — do I need to redo this?</dt>
-      <dd>If the update replaces the binary at the same path, existing grants usually survive. If computer use
-        starts looping again after an update, repeat steps 1–4 — two minutes.</dd>
+      <dd>Depends on your install type — step 1's <code>readlink</code> output tells you which you have.
+        <b>Homebrew/npm/bun</b> (path like <code>/opt/homebrew/…</code>): the binary is replaced in place, the
+        path is stable, grants survive updates. <b>Native installer</b> (path like
+        <code>~/.local/share/claude/versions/&lt;version&gt;</code>): each release is a new binary at a new
+        path, so TCC treats it as a new app and grants break on <em>every</em> update — repeat steps 1–4 each
+        time, and expect Privacy &amp; Security to accumulate one stale row per version, named by bare version
+        number (e.g. “2.1.202”). Community reports say <code>tccutil reset</code> does <em>not</em> clear those
+        stale rows. Tracked upstream in
+        <a href="https://github.com/anthropics/claude-code/issues/49282">#49282</a>,
+        <a href="https://github.com/anthropics/claude-code/issues/48311">#48311</a> and
+        <a href="https://github.com/anthropics/claude-code/issues/74028">#74028</a>.</dd>
     </dl>
 
     <div class="copybar">

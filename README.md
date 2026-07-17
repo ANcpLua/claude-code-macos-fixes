@@ -37,6 +37,8 @@ claude -c         # or: continue the most recent session directly
 
 The fix also holds **inside tmux**, because it targets the `claude` binary itself.
 
+**Install-type caveat:** if step 1 prints a path like `~/.local/share/claude/versions/<version>` (native installer), the binary path rotates on every update, TCC treats each release as a new app, and you'll redo steps 1–4 after each update — with one stale row per version accumulating in Privacy & Security ([#49282](https://github.com/anthropics/claude-code/issues/49282)). Homebrew/npm/bun paths are stable, so grants persist.
+
 ## The traps
 
 - **The "+" dialog search field is Spotlight** — it will never find `/opt/homebrew`. Drag & drop from Finder instead.
