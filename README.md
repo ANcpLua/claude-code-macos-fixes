@@ -45,3 +45,11 @@ The fix also holds **inside tmux**, because it targets the `claude` binary itsel
 - **The orphaned per-version helper** (community-reported, unverified here) — see [anthropics/claude-code#50735](https://github.com/anthropics/claude-code/issues/50735); a last resort only, after ruling out the traps above.
 
 See the [HTML guide](computer-use-tcc-fix.html) for the full walkthrough, before/after transcripts, and FAQ.
+
+## Related upstream issues
+
+None of these is *exactly* this guide's scenario (grants attributed to the wrong app + stale process), but they share the same TCC-binds-to-the-binary root cause:
+
+- [#74028](https://github.com/anthropics/claude-code/issues/74028) — Screen Recording must be re-approved on every update (native installer's versioned binary path). We [commented](https://github.com/anthropics/claude-code/issues/74028#issuecomment-5000380193) with the re-grant recipe and a Homebrew data point: stable install path → grants persist.
+- [#49282](https://github.com/anthropics/claude-code/issues/49282) / [#48311](https://github.com/anthropics/claude-code/issues/48311) — each versioned binary registers as a new app in Privacy & Security.
+- [#50735](https://github.com/anthropics/claude-code/issues/50735) — a *different* failure with the same symptom: the loop persists even with correct grants, due to an orphaned per-version helper (our Trap 5, unverified here).
